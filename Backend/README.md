@@ -221,3 +221,139 @@ curl -X POST http://localhost:3000/login \
 }'
 ```
 
+
+# /profile Endpoint Documentation
+
+## Description
+
+The `/profile` endpoint is used to retrieve the authenticated user's profile information. It requires a valid JSON Web Token (JWT) to access and returns the user's data stored in the system.
+
+---
+
+## HTTP Method
+
+**GET**
+
+---
+
+## Authentication
+
+This endpoint **requires** authentication via JWT. The token must be provided either:
+
+* In a `Cookie` named `token`, or
+* In the `Authorization` header as a Bearer token.
+
+---
+
+## Request Headers
+
+| Header Name     | Required                  | Description                   |
+| --------------- | ------------------------- | ----------------------------- |
+| `Authorization` | Yes (if not using cookie) | Format: `Bearer <token>`      |
+| `Cookie`        | Yes (if not using header) | Cookie named `token` with JWT |
+
+---
+
+## Response
+
+### Success Response
+
+* **Status Code:** `200 OK`
+* **Body:**
+
+  ```json
+  {
+    "_id": "609b8f1b8f1b8f1b8f1b8f1b",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com"
+  }
+  ```
+
+### Error Responses
+
+#### Unauthorized Access
+
+* **Status Code:** `401 Unauthorized`
+* **Body:**
+
+  ```json
+  {
+    "message": "Access Denied. No token provided."
+  }
+  ```
+
+---
+
+## Example cURL Request
+
+```bash
+curl -X GET http://localhost:3000/profile \
+-H "Authorization: Bearer <your_jwt_token>"
+```
+
+---
+
+# /logout Endpoint Documentation
+
+## Description
+
+The `/logout` endpoint is used to log out an authenticated user by clearing their JWT cookie and blacklisting the token to prevent further use. It ensures the token cannot be reused for future requests.
+
+---
+
+## HTTP Method
+
+**GET**
+
+---
+
+## Authentication
+
+This endpoint **requires** authentication via JWT. The token must be provided either:
+
+* In a `Cookie` named `token`, or
+* In the `Authorization` header as a Bearer token.
+
+---
+
+## Request Headers
+
+| Header Name     | Required                  | Description                   |
+| --------------- | ------------------------- | ----------------------------- |
+| `Authorization` | Yes (if not using cookie) | Format: `Bearer <token>`      |
+| `Cookie`        | Yes (if not using header) | Cookie named `token` with JWT |
+
+---
+
+## Response
+
+### Success Response
+
+* **Status Code:** `200 OK`
+* **Body:**
+
+  ```json
+  {
+    "message": "Logged Out"
+  }
+  ```
+
+---
+
+## Notes
+
+* The endpoint clears the `token` cookie from the client.
+* It also saves the token to a blacklist, which should be checked in middleware for future protected route access.
+* Ensure proper token revocation logic is implemented in the auth middleware.
+
+---
+
+## Example cURL Request
+
+```bash
+curl -X GET http://localhost:3000/logout \
+-H "Authorization: Bearer <your_jwt_token>"
+```
