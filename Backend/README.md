@@ -1,3 +1,4 @@
+# Users
 # /register Endpoint Documentation
 
 ## Description
@@ -357,3 +358,153 @@ This endpoint **requires** authentication via JWT. The token must be provided ei
 curl -X GET http://localhost:3000/logout \
 -H "Authorization: Bearer <your_jwt_token>"
 ```
+---
+
+# Captains
+
+# /captains/register Endpoint Documentation
+
+## Description
+
+The `/captains/register` endpoint is used to register a new captain in the system. It accepts captain details including name, email, password, and vehicle information. It performs validation on all inputs and creates a new captain in the database. Upon successful registration, a JSON Web Token (JWT) is returned for authentication.
+
+---
+
+## HTTP Method
+
+**POST**
+
+---
+
+## Request Body
+
+The following fields are required in the request body:
+
+| Field                 | Type    | Required | Validation                                       |
+| --------------------- | ------- | -------- | ------------------------------------------------ |
+| `fullname.firstname`  | String  | Yes      | Must be at least 3 characters long.              |
+| `fullname.lastname`   | String  | No       | If provided, must be at least 3 characters long. |
+| `email`               | String  | Yes      | Must be a valid email address.                   |
+| `password`            | String  | Yes      | Must be at least 6 characters long.              |
+| `vehicle.color`       | String  | Yes      | Must be at least 3 characters long.              |
+| `vehicle.plate`       | String  | Yes      | Must be at least 3 characters long.              |
+| `vehicle.capacity`    | Integer | Yes      | Must be a number greater than or equal to 1.     |
+| `vehicle.vehicleType` | String  | Yes      | Must be one of: `car`, `motorcycle`, `auto`.     |
+
+### Example Request Body
+
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "color": "red",
+    "plate": "KA 01 AB 1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+---
+
+## Response
+
+### Success Response
+
+* **Status Code:** `201 Created`
+* **Body:**
+
+  ```json
+  {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "captain": {
+      "_id": "60c72b2f4f1a4c3d5c3e94a7",
+      "fullname": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "john.doe@example.com",
+      "vehicle": {
+        "color": "red",
+        "plate": "KA 01 AB 1234",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      "status": "inactive"
+    }
+  }
+  ```
+
+### Error Responses
+
+#### Validation Errors
+
+* **Status Code:** `400 Bad Request`
+* **Body:**
+
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid Email",
+        "param": "email",
+        "location": "body"
+      },
+      {
+        "msg": "First name must be at least 3 characters long",
+        "param": "fullname.firstname",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+#### Captain Already Exists
+
+* **Status Code:** `400 Bad Request`
+* **Body:**
+
+  ```json
+  {
+    "message": "Captain already exist"
+  }
+  ```
+
+---
+
+## Notes
+
+* The password is hashed before being stored in the database.
+* The `token` returned in the response can be used for authenticated requests (e.g., managing rides).
+* Ensure the `Content-Type` header is set to `application/json` when making the request.
+
+---
+
+## Example cURL Request
+
+```bash
+curl -X POST http://localhost:4000/captains/register \
+-H "Content-Type: application/json" \
+-d '{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "color": "red",
+    "plate": "KA 01 AB 1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}'
+```
+
+---
+
